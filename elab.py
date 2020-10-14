@@ -6,6 +6,7 @@ import pickle
 from googleapiclient.discovery import build
 import queue
 import time
+import numpy as np
 
 ## global variables
 qbuff = queue.Queue()
@@ -46,14 +47,15 @@ def main():
         return
 
     service = build('docs', 'v1', credentials=creds)
-
+    counter=0
     try:
         print("Listening PV ...")
         qbuff.queue.clear()
         while(True):
             if qbuff.qsize()>0:
                 if (sessionstatepv.value>0):
-                    DOCUMENT_ID = docidpv.value.tobytes().decode('UTF-8')
+                    idconv = np.trim_zeros(np.array(docidpv.value))
+                    DOCUMENT_ID = idconv.tobytes().decode('UTF-8').strip()
                     msg = ""
                     while qbuff.qsize():
                         msg=msg+qbuff.get().tobytes().decode('UTF-8')+'\n'
@@ -62,10 +64,12 @@ def main():
                     if DEBUG: print(msg, end='')
                     try:
                         result = service.documents().batchUpdate(documentId=DOCUMENT_ID, body={'requests': requests}).execute()
+                        counter=(counter+1)%10000
+                        elab_status.put("OK. Post ID: {:d}".format(counter))
+                        if DEBUG: print("OK. Post ID: {:d}".format(counter))
                     except:
                         elab_status.put("Could not find document")
                         if DEBUG: print("Could not find document")
-
                 else:
                     qbuff.queue.clear()
             time.sleep(5)
