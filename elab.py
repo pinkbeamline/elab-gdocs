@@ -64,7 +64,7 @@ def main():
                         result = service.documents().batchUpdate(documentId=DOCUMENT_ID, body={'requests': requests}).execute()
                     except:
                         elab_status.put("Could not find document")
-                        print("Could not find document")
+                        if DEBUG: print("Could not find document")
 
                 else:
                     qbuff.queue.clear()
