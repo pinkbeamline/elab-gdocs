@@ -68,7 +68,6 @@ def main():
 
                 else:
                     qbuff.queue.clear()
-                    print(DOCUMENT_ID)
             time.sleep(5)
     except KeyboardInterrupt:
         print("\nBye")
