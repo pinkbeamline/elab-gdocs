@@ -58,7 +58,13 @@ def main():
                     DOCUMENT_ID = idconv.tobytes().decode('UTF-8').strip()
                     msg = ""
                     while qbuff.qsize():
-                        msg=msg+qbuff.get().tobytes().decode('UTF-8')+'\n'
+                        try:
+                            tempobj = np.trim_zeros(np.array(qbuff.get()))
+                            tempmsg = tempobj.tobytes().decode('UTF-8')+'\n'
+                            msg=msg+tempmsg
+                        except:
+                            print("[Err] Could not convert type: " + str(type(tempobj)) )
+                            print("[Err] To string: " + str(tempobj) )
                     requests=build_request(msg)
                     if DEBUG: print(DOCUMENT_ID)
                     if DEBUG: print(msg, end='')
